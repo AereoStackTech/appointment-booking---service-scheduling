@@ -1,0 +1,6 @@
+{
+  "name": "CalenPulse — Appointment Booking & Service Scheduling",
+  "description": "A streamlined, full-stack appointment booking and schedule management platform with mobile-first customer booking, dynamic conflict-free slot calculation, and administrative operations dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

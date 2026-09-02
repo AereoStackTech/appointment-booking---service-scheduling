@@ -1,0 +1,141 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         Role          @default(STAFF)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  statusNotes  StatusAudit[]
+
+  @@map("users")
+}
+
+model Service {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String        @db.Text
+  durationMin  Int           // e.g., 30, 60, 90
+  bufferMin    Int           @default(15) // buffer after session
+  price        Decimal       @db.Decimal(10, 2)
+  isActive     Boolean       @default(true)
+  colorTag     String        @default("#3B82F6")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("services")
+}
+
+model Client {
+  id           String        @id @default(cuid())
+  fullName     String
+  email        String
+  phone        String
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+
+  @@index([email])
+  @@index([phone])
+  @@map("clients")
+}
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  referenceCode      String            @unique // e.g., "CP-89247"
+  serviceId          String
+  service            Service           @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  clientId           String
+  client             Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  startTime          DateTime
+  endTime            DateTime
+  status             AppointmentStatus @default(PENDING)
+  clientNotes        String?
+  internalNotes      String?
+  cancellationReason String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  statusAudits       StatusAudit[]
+
+  @@index([startTime, endTime])
+  @@index([status])
+  @@index([clientId])
+  @@index([serviceId])
+  @@index([referenceCode])
+  @@map("appointments")
+}
+
+model WeeklyAvailability {
+  id        String    @id @default(cuid())
+  dayOfWeek DayOfWeek @unique
+  startTime String    // "09:00" (24h format)
+  endTime   String    // "18:00"
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("weekly_availability")
+}
+
+model BlackoutPeriod {
+  id        String   @id @default(cuid())
+  title     String   // e.g., "Public Holiday", "Studio Maintenance"
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blackout_periods")
+}
+
+model StatusAudit {
+  id            String            @id @default(cuid())
+  appointmentId String
+  appointment   Appointment       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  changedById   String?
+  changedBy     User?             @relation(fields: [changedById], references: [id], onDelete: SetNull)
+  fromStatus    AppointmentStatus
+  toStatus      AppointmentStatus
+  notes         String?
+  timestamp     DateTime          @default(now())
+
+  @@index([appointmentId])
+  @@map("status_audits")
+}
