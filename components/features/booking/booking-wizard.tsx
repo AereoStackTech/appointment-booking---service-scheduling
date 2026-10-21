@@ -37,6 +37,7 @@ import {
   downloadIcsFile,
 } from "@/lib/calendar-export";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface ServiceItem {
   id: string;
@@ -67,6 +68,8 @@ export function BookingWizard({
   services,
   preselectedServiceSlug,
 }: BookingWizardProps) {
+  const { t, formatDate } = useLanguage();
+
   // Step tracking: 1 = Service, 2 = Date & Time, 3 = Client Details, 4 = Confirmation
   const initialService = React.useMemo(() => {
     if (preselectedServiceSlug) {
@@ -197,7 +200,7 @@ export function BookingWizard({
                 {step > 1 ? "✓" : "1"}
               </div>
               <span className="text-[11px] font-semibold mt-1.5 whitespace-nowrap">
-                Service
+                {t("step1Title")}
               </span>
             </div>
 
@@ -222,7 +225,7 @@ export function BookingWizard({
                 {step > 2 ? "✓" : "2"}
               </div>
               <span className="text-[11px] font-semibold mt-1.5 whitespace-nowrap">
-                Date & Time
+                {t("step2Title")}
               </span>
             </div>
 
@@ -244,7 +247,7 @@ export function BookingWizard({
                 3
               </div>
               <span className="text-[11px] font-semibold mt-1.5 whitespace-nowrap">
-                Client Info
+                {t("step3Title")}
               </span>
             </div>
           </div>
@@ -256,10 +259,10 @@ export function BookingWizard({
         <div className="space-y-6 animate-in fade-in-50 duration-200">
           <div className="text-center max-w-lg mx-auto mb-6">
             <h2 className="text-2xl font-bold tracking-tight text-stone-900">
-              Select an Appointment Service
+              {t("step1Title")}
             </h2>
             <p className="text-sm text-stone-500 mt-1">
-              Choose the consultation or service package that fits your goals.
+              {t("step1Subtitle")}
             </p>
           </div>
 
@@ -303,7 +306,7 @@ export function BookingWizard({
                     <div className="flex items-center justify-between pt-3 border-t border-stone-100 text-xs text-stone-600">
                       <span className="flex items-center">
                         <Clock className="w-3.5 h-3.5 mr-1 text-stone-400" />
-                        {service.durationMin} minutes
+                        {service.durationMin} {t("min")}
                       </span>
                       <Button
                         type="button"
@@ -311,7 +314,7 @@ export function BookingWizard({
                         variant={isSelected ? "primary" : "outline"}
                         className="h-8 text-xs font-semibold px-3"
                       >
-                        {isSelected ? "Selected" : "Choose Service"}
+                        {isSelected ? t("selected") : t("selectServiceBtn")}
                       </Button>
                     </div>
                   </div>
@@ -327,7 +330,7 @@ export function BookingWizard({
               onClick={() => setStep(2)}
               className="px-6 h-11 text-sm font-semibold"
             >
-              Continue to Date & Time
+              {t("continue")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -345,10 +348,10 @@ export function BookingWizard({
               />
               <div>
                 <p className="text-xs text-stone-500 uppercase tracking-wider font-semibold">
-                  Selected Service
+                  {t("selected")}
                 </p>
                 <h4 className="font-bold text-stone-900 text-sm">
-                  {selectedService.name} ({selectedService.durationMin} min • $
+                  {selectedService.name} ({selectedService.durationMin} {t("min")} • $
                   {selectedService.price.toFixed(2)})
                 </h4>
               </div>
@@ -359,7 +362,7 @@ export function BookingWizard({
               onClick={() => setStep(1)}
               className="text-xs"
             >
-              Change
+              {t("back")}
             </Button>
           </div>
 
@@ -367,7 +370,7 @@ export function BookingWizard({
             {/* Calendar Widget */}
             <div className="md:col-span-6">
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
-                1. Select Date
+                {t("selectDateHeading")}
               </label>
               <Calendar
                 selectedDate={selectedDate}
@@ -381,39 +384,39 @@ export function BookingWizard({
             {/* Slots Widget */}
             <div className="md:col-span-6 flex flex-col">
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">
-                2. Select Available Start Time
+                {t("selectTimeHeading")}
               </label>
 
               <div className="flex-1 bg-white p-4 rounded-xl border border-stone-200 flex flex-col justify-between min-h-[320px]">
                 <div>
                   <div className="flex items-center justify-between pb-3 border-b border-stone-100 mb-3">
                     <span className="text-xs font-semibold text-stone-800">
-                      {formatDateFull(new Date(`${selectedDate}T00:00:00`))}
+                      {formatDate(new Date(`${selectedDate}T00:00:00`))}
                     </span>
                     <span className="text-[11px] text-stone-500">
-                      {selectedService.durationMin}m duration
+                      {selectedService.durationMin} {t("min")}
                     </span>
                   </div>
 
                   {loadingSlots ? (
                     <div className="py-16 text-center text-stone-400">
                       <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-600" />
-                      <p className="text-xs font-medium">Calculating available slots...</p>
+                      <p className="text-xs font-medium">{t("loadingSlots")}</p>
                     </div>
                   ) : isClosed ? (
                     <div className="py-12 text-center text-stone-500 bg-stone-50 rounded-lg p-4 border border-stone-100 my-4">
                       <Clock className="w-6 h-6 mx-auto mb-2 text-stone-400" />
                       <p className="text-xs font-semibold text-stone-700">
-                        {closedReason || "Studio Closed on this date"}
+                        {closedReason || t("closedToday")}
                       </p>
                       <p className="text-[11px] text-stone-400 mt-1">
-                        Please choose another working day on the calendar.
+                        {t("chooseAnotherDate")}
                       </p>
                     </div>
                   ) : slots.length === 0 ? (
                     <div className="py-12 text-center text-stone-500">
-                      <p className="text-xs font-medium">No open slots remaining for this date.</p>
-                      <p className="text-[11px] text-stone-400 mt-1">Please select an alternate date.</p>
+                      <p className="text-xs font-medium">{t("noSlotsAvailable")}</p>
+                      <p className="text-[11px] text-stone-400 mt-1">{t("chooseAnotherDate")}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
@@ -445,10 +448,10 @@ export function BookingWizard({
                 {selectedSlot && (
                   <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-600 bg-indigo-50/50 p-2.5 rounded-lg border border-indigo-100">
                     <span className="font-semibold text-indigo-900">
-                      Selected: {formatTime12(parseSlotTime(selectedDate, selectedSlot))}
+                      {t("slotSelected")} {formatTime12(parseSlotTime(selectedDate, selectedSlot))}
                     </span>
                     <span className="font-mono text-indigo-700">
-                      {selectedService.durationMin} mins
+                      {selectedService.durationMin} {t("min")}
                     </span>
                   </div>
                 )}
@@ -464,7 +467,7 @@ export function BookingWizard({
               className="text-xs"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              Back to Services
+              {t("back")}
             </Button>
 
             <Button
@@ -474,7 +477,7 @@ export function BookingWizard({
               onClick={() => setStep(3)}
               className="px-6 h-11 text-sm font-semibold"
             >
-              Confirm Time & Details
+              {t("continue")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -502,13 +505,13 @@ export function BookingWizard({
             <div className="flex flex-wrap items-center gap-4 text-xs text-stone-300">
               <div className="flex items-center">
                 <CalendarIcon className="w-3.5 h-3.5 mr-1.5 text-stone-400" />
-                <span>{formatDateFull(new Date(`${selectedDate}T00:00:00`))}</span>
+                <span>{formatDate(new Date(`${selectedDate}T00:00:00`))}</span>
               </div>
               <div className="flex items-center">
                 <Clock className="w-3.5 h-3.5 mr-1.5 text-stone-400" />
                 <span>
                   {formatTime12(parseSlotTime(selectedDate, selectedSlot))} (
-                  {selectedService.durationMin} mins)
+                  {selectedService.durationMin} {t("min")})
                 </span>
               </div>
             </div>
@@ -516,17 +519,17 @@ export function BookingWizard({
 
           <form onSubmit={handleSubmitBooking} className="bg-white p-6 rounded-xl border border-stone-200 space-y-4">
             <h3 className="text-base font-bold text-stone-900">
-              Your Contact Information
+              {t("clientInfoHeading")}
             </h3>
             <p className="text-xs text-stone-500">
-              No account required. Instant confirmation and booking reference code will be generated immediately.
+              {t("clientInfoSubheading")}
             </p>
 
             {submitError && (
               <div className="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start space-x-2">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-semibold">Booking Collision</p>
+                  <p className="font-semibold">{t("fixErrorsNotice")}</p>
                   <p>{submitError}</p>
                 </div>
               </div>
@@ -535,11 +538,11 @@ export function BookingWizard({
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-stone-800 flex items-center">
                 <User className="w-3.5 h-3.5 mr-1 text-stone-400" />
-                Full Name <span className="text-rose-500 ml-1">*</span>
+                {t("fullNameLabel")} <span className="text-rose-500 ml-1">*</span>
               </label>
               <Input
                 required
-                placeholder="e.g. Elena Rostova"
+                placeholder={t("fullNamePlaceholder")}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 className="text-xs"
@@ -550,12 +553,12 @@ export function BookingWizard({
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-stone-800 flex items-center">
                   <Mail className="w-3.5 h-3.5 mr-1 text-stone-400" />
-                  Email Address <span className="text-rose-500 ml-1">*</span>
+                  {t("emailLabel")} <span className="text-rose-500 ml-1">*</span>
                 </label>
                 <Input
                   type="email"
                   required
-                  placeholder="elena@example.com"
+                  placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="text-xs"
@@ -565,12 +568,12 @@ export function BookingWizard({
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-stone-800 flex items-center">
                   <Phone className="w-3.5 h-3.5 mr-1 text-stone-400" />
-                  Phone Number <span className="text-rose-500 ml-1">*</span>
+                  {t("phoneLabel")} <span className="text-rose-500 ml-1">*</span>
                 </label>
                 <Input
                   type="tel"
                   required
-                  placeholder="+1 (555) 019-2834"
+                  placeholder={t("phonePlaceholder")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="text-xs"
@@ -581,10 +584,10 @@ export function BookingWizard({
             <div className="space-y-1.5 pt-1">
               <label className="text-xs font-semibold text-stone-800 flex items-center">
                 <FileText className="w-3.5 h-3.5 mr-1 text-stone-400" />
-                Notes or Specific Requests for the Practitioner (Optional)
+                {t("notesLabel")}
               </label>
               <Textarea
-                placeholder="Share any background details, current concerns, or goals..."
+                placeholder={t("notesPlaceholder")}
                 value={clientNotes}
                 onChange={(e) => setClientNotes(e.target.value)}
                 rows={3}
@@ -601,7 +604,7 @@ export function BookingWizard({
                 className="text-xs"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
-                Change Time
+                {t("back")}
               </Button>
 
               <Button
@@ -613,11 +616,11 @@ export function BookingWizard({
                 {submitting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Confirming Reservation...
+                    {t("submittingBooking")}
                   </>
                 ) : (
                   <>
-                    Submit Appointment Request
+                    {t("submitBooking")}
                     <CheckCircle2 className="w-4 h-4 ml-2" />
                   </>
                 )}
@@ -636,13 +639,13 @@ export function BookingWizard({
 
           <div>
             <span className="inline-block px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-mono font-bold mb-2">
-              Reference Code: {confirmedBooking.referenceCode}
+              {t("bookingReference")}: {confirmedBooking.referenceCode}
             </span>
             <h2 className="text-2xl font-bold tracking-tight text-stone-900">
-              Your Appointment is Confirmed!
+              {t("bookingSuccessTitle")}
             </h2>
             <p className="text-sm text-stone-500 max-w-md mx-auto mt-1">
-              Thank you, {confirmedBooking.client?.fullName || fullName}. A confirmation has been registered for your session.
+              {t("bookingSuccessSubtitle")}
             </p>
           </div>
 
@@ -657,7 +660,7 @@ export function BookingWizard({
 
             <div className="flex items-center text-stone-700">
               <CalendarIcon className="w-4 h-4 mr-2 text-stone-400" />
-              <span>{formatDateFull(confirmedBooking.startTime)}</span>
+              <span>{formatDate(confirmedBooking.startTime)}</span>
             </div>
 
             <div className="flex items-center text-stone-700">
@@ -676,7 +679,7 @@ export function BookingWizard({
           {/* Calendar Sync Actions */}
           <div className="pt-2 max-w-md mx-auto space-y-2">
             <p className="text-xs font-semibold text-stone-700 uppercase tracking-wider">
-              Add to Your Calendar
+              {t("addToGoogleCalendar")} &amp; Export
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <a
@@ -709,7 +712,7 @@ export function BookingWizard({
                 }}
               >
                 <Download className="w-4 h-4 mr-2 text-indigo-600" />
-                Apple / Outlook (.ics)
+                {t("downloadIcs")}
               </Button>
             </div>
           </div>
@@ -736,7 +739,7 @@ export function BookingWizard({
               }}
               className="text-xs"
             >
-              Book Another Appointment
+              {t("bookAnother")}
             </Button>
           </div>
         </div>

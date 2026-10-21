@@ -17,6 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSelector } from "@/components/shared/language-selector";
+import { useLanguage } from "@/lib/i18n/context";
 
 interface SidebarProps {
   user?: {
@@ -28,40 +30,41 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const navItems = [
     {
-      label: "Operational Agenda",
+      label: t("operationalAgenda"),
       href: "/dashboard",
       icon: LayoutDashboard,
       match: pathname === "/dashboard",
     },
     {
-      label: "Appointments Hub",
+      label: t("appointmentsHub"),
       href: "/appointments",
       icon: CalendarCheck,
       match: pathname.startsWith("/appointments"),
     },
     {
-      label: "Service Catalog",
+      label: t("serviceCatalog"),
       href: "/services",
       icon: Layers,
       match: pathname.startsWith("/services"),
     },
     {
-      label: "Availability & Hours",
+      label: t("availabilityHours"),
       href: "/availability",
       icon: Clock,
       match: pathname.startsWith("/availability"),
     },
     {
-      label: "Client Directory",
+      label: t("clientDirectory"),
       href: "/clients",
       icon: Users,
       match: pathname.startsWith("/clients"),
     },
     {
-      label: "Studio Settings",
+      label: t("studioSettings"),
       href: "/settings",
       icon: Settings,
       match: pathname.startsWith("/settings"),
@@ -79,10 +82,10 @@ export function Sidebar({ user }: SidebarProps) {
             </div>
             <div>
               <span className="text-white font-bold text-xl tracking-tight leading-none block">
-                CalenPulse
+                {t("brandName")}
               </span>
               <span className="text-[10px] text-stone-400 font-mono tracking-wider">
-                Operations
+                {t("operations")}
               </span>
             </div>
           </Link>
@@ -97,7 +100,7 @@ export function Sidebar({ user }: SidebarProps) {
           >
             <span className="flex items-center">
               <Sparkles className="w-3.5 h-3.5 mr-2 text-indigo-400" />
-              Client Booking Portal
+              {t("clientPortal")}
             </span>
             <ExternalLink className="w-3 h-3 text-indigo-400" />
           </Link>
@@ -131,9 +134,17 @@ export function Sidebar({ user }: SidebarProps) {
         </nav>
       </div>
 
-      {/* Footer / User Profile */}
-      <div className="p-4 border-t border-stone-800 bg-stone-950/40">
-        <div className="flex items-center justify-between mb-3">
+      {/* Footer / User Profile & Language Changer */}
+      <div className="p-4 border-t border-stone-800 bg-stone-950/40 space-y-3">
+        {/* Language Changer inside sidebar */}
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[11px] text-stone-400 font-medium">
+            {t("language")}
+          </span>
+          <LanguageSelector variant="dark" align="left" />
+        </div>
+
+        <div className="flex items-center justify-between pt-2 border-t border-stone-800/60">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="w-8 h-8 rounded-full bg-indigo-500/20 border border-indigo-500 flex items-center justify-center text-indigo-400 font-bold text-xs shrink-0">
               {user?.name ? user.name.slice(0, 2).toUpperCase() : "AD"}
@@ -155,7 +166,7 @@ export function Sidebar({ user }: SidebarProps) {
           className="w-full flex items-center justify-center px-3 py-1.5 text-xs text-stone-400 hover:text-white hover:bg-stone-800 rounded-md transition-colors border border-stone-800"
         >
           <LogOut className="w-3.5 h-3.5 mr-1.5" />
-          Sign Out
+          {t("signOut")}
         </button>
       </div>
     </aside>

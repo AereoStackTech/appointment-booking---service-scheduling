@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LanguageSelector } from "@/components/shared/language-selector";
+import { useLanguage } from "@/lib/i18n/context";
 
 export default function LoginPage() {
   return (
@@ -35,6 +37,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const { t } = useLanguage();
 
   const [email, setEmail] = React.useState("admin@calenpulse.internal");
   const [password, setPassword] = React.useState("AdminPass123!");
@@ -80,18 +83,23 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-stone-100">
+    <div className="min-h-screen bg-stone-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 text-stone-100 relative">
+      {/* Top right language changer */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <LanguageSelector variant="dark" />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center px-4">
         <Link href="/book" className="inline-flex items-center space-x-2.5 mb-6">
           <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
             CP
           </div>
           <span className="text-xl font-bold tracking-tight text-white">
-            CalenPulse
+            {t("brandName")}
           </span>
         </Link>
         <h2 className="text-2xl font-bold tracking-tight text-white">
-          Staff Operational Console
+          {t("staffConsole")}
         </h2>
         <p className="mt-1 text-xs text-stone-400">
           Secure credentials authentication for administrators and studio staff
@@ -200,7 +208,7 @@ function LoginForm() {
             href="/book"
             className="text-xs text-stone-400 hover:text-stone-200 transition-colors inline-flex items-center"
           >
-            ← Return to Public Booking Portal
+            ← {t("clientPortal")}
           </Link>
         </div>
       </div>

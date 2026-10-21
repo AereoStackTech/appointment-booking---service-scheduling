@@ -4,6 +4,7 @@ import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDateIso } from "@/lib/time";
+import { useLanguage } from "@/lib/i18n/context";
 
 export interface CalendarProps {
   selectedDate?: string; // "YYYY-MM-DD"
@@ -24,6 +25,7 @@ export function Calendar({
   disabledDaysOfWeek = [],
   className,
 }: CalendarProps) {
+  const { language } = useLanguage();
   const initialDate = selectedDate ? new Date(selectedDate) : new Date();
   const [currentMonth, setCurrentMonth] = React.useState(
     new Date(initialDate.getFullYear(), initialDate.getMonth(), 1)
@@ -44,10 +46,19 @@ export function Calendar({
   const todayStr = formatDateIso(new Date());
   const effectiveMinDate = minDate ?? todayStr;
 
-  const monthName = currentMonth.toLocaleString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
+  const monthName = React.useMemo(() => {
+    try {
+      return currentMonth.toLocaleString(language.locale, {
+        month: "long",
+        year: "numeric",
+      });
+    } catch {
+      return currentMonth.toLocaleString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    }
+  }, [currentMonth, language.locale]);
 
   // Calculate calendar grid days
   const year = currentMonth.getFullYear();
@@ -63,7 +74,21 @@ export function Calendar({
     days.push(d);
   }
 
-  const dayHeaders = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  // Generate localized day headers starting Sunday
+  const dayHeaders = React.useMemo(() => {
+    try {
+      const headers: string[] = [];
+      // Pick a Sunday as base: 2026-01-04 is a Sunday
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(2026, 0, 4 + i);
+        const name = d.toLocaleDateString(language.locale, { weekday: "narrow" });
+        headers.push(name);
+      }
+      return headers;
+    } catch {
+      return ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    }
+  }, [language.locale]);
 
   return (
     <div className={cn("p-4 bg-white rounded-xl border border-stone-200 select-none", className)}>

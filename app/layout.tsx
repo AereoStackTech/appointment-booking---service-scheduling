@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { AuthProvider } from '@/components/shared/auth-provider';
+import { LanguageProvider } from '@/lib/i18n/context';
 
 export const metadata: Metadata = {
   title: 'CalenPulse — Appointment Booking & Service Scheduling',
@@ -19,9 +20,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );
